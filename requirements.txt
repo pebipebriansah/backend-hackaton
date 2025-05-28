@@ -7,3 +7,5 @@ python-dotenv
 python-jose
 azure-functions
 sqlalchemy
+email-validator
+pydantic[email]
