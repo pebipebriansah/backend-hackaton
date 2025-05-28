@@ -12,9 +12,14 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",  # untuk development frontend (React/Vite)
+    "https://your-frontend-domain.com",  # jika kamu nanti deploy frontend
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # sesuaikan domain asal jika mau dibatasi
+    allow_origins=origins,  # sesuaikan domain asal jika mau dibatasi
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
