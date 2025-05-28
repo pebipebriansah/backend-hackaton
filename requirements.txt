@@ -9,3 +9,4 @@ azure-functions
 sqlalchemy
 email-validator
 pydantic[email]
+passlib[bcrypt]==1.7.4
