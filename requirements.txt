@@ -3,4 +3,5 @@ uvicorn[standard]
 aiofiles
 python-multipart
 pyodbc
-python-dotenvazure-functions
+python-dotenv
+azure-functions
