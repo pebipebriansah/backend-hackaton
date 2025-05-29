@@ -4,9 +4,13 @@ class PetaniLogin(BaseModel):
     email: str
     password: str
 
-class Token(BaseModel):
+class TokenData(BaseModel):
     access_token: str
     token_type: str
+
+class TokenWithInfo(TokenData):
+    email: EmailStr
+    nama_petani: str
 
 class PetaniRegister(BaseModel):
     nama_petani: str

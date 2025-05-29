@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.petani import PetaniLogin, Token
+from app.schemas.petani import PetaniLogin, TokenWithInfo
 from app.crud.petani import get_petani_by_email
 from app.database import SessionLocal
 from jose import jwt
@@ -27,7 +27,7 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=TokenWithInfo)
 def login(petani: PetaniLogin, db: Session = Depends(get_db)):
     db_petani = get_petani_by_email(db, petani.email)
     if not db_petani or not verify_password(petani.password, db_petani.password):
@@ -37,4 +37,9 @@ def login(petani: PetaniLogin, db: Session = Depends(get_db)):
         data={"sub": db_petani.email},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "email": db_petani.email,
+        "nama_petani": db_petani.nama_petani
+    }
