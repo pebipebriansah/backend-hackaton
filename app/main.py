@@ -14,7 +14,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",  # untuk development frontend (React/Vite)
-    "https://your-frontend-domain.com",  # jika kamu nanti deploy frontend
+    "https://frontend-hackaton-ggro.vercel.app",  # jika kamu nanti deploy frontend
 ]
 
 app.add_middleware(
