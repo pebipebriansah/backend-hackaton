@@ -13,7 +13,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",  # untuk development frontend (React/Vite)
+    "http://localhost:5173/",  # untuk development frontend (React/Vite)
     "https://frontend-hackaton-ggro.vercel.app",  # jika kamu nanti deploy frontend
 ]
 
