@@ -20,7 +20,7 @@ app = FastAPI(
 # Domain frontend yang diperbolehkan mengakses backend
 origins = [
     "http://localhost:5173",  # untuk development lokal
-    "https://frontend-hackaton-ggro.vercel.app",  # frontend deploy
+    "https://salmon-sky-06cf0f700.6.azurestaticapps.net",  # frontend deploy
 ]
 
 # Konfigurasi CORS
