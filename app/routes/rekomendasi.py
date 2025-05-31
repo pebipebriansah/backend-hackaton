@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from schemas.rekomendasi import RekomendasiRequest, RekomendasiResponse
-from crud.rekomendasi import generate_rekomendasi_openai
+from app.schemas.rekomendasi import RekomendasiRequest, RekomendasiResponse
+from app.crud.rekomendasi import generate_rekomendasi_openai
 
 app = FastAPI()
 
