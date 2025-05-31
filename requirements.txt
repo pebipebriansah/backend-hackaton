@@ -11,3 +11,4 @@ email-validator
 pydantic[email]
 passlib[bcrypt]==1.7.4
 httpx
+openai

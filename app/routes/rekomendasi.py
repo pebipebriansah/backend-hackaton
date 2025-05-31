@@ -1,10 +1,10 @@
-from fastapi import APIRouter
-from app.schemas.rekomendasi import KeluhanInput, RekomendasiOutput
-from app.crud.rekomendasi import generate_rekomendasi
+from fastapi import FastAPI
+from schemas.rekomendasi import RekomendasiRequest, RekomendasiResponse
+from crud.rekomendasi import generate_rekomendasi_openai
 
-router = APIRouter(prefix="/rekomendasi", tags=["Rekomendasi"])
+app = FastAPI()
 
-@router.post("/", response_model=RekomendasiOutput)
-def get_rekomendasi(data: KeluhanInput):
-    hasil = generate_rekomendasi(data.keluhan)
+@app.post("/rekomendasi", response_model=RekomendasiResponse)
+def buat_rekomendasi(req: RekomendasiRequest):
+    hasil = generate_rekomendasi_openai(req.keluhan)
     return {"rekomendasi": hasil}
