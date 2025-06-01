@@ -34,7 +34,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
-            temperature=0.7s
+            temperature=0.7
         )
         return response.choices[0].message.content.strip()
 
