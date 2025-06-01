@@ -8,10 +8,10 @@ client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
-deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # This should be your deployment name
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
+        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # This should be your deployment name
         if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
