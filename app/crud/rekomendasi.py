@@ -28,13 +28,13 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            model=deployment_name,  # Use the deployment name as the model parameter
+            model="ai-hackaton-petani",  # Use the deployment name as the model parameter
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
-            temperature=0.7
+            temperature=0.7s
         )
         return response.choices[0].message.content.strip()
 
