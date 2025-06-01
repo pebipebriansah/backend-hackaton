@@ -2,16 +2,17 @@ import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # pastikan file .env terbaca
 
-# Inisialisasi client khusus untuk Azure OpenAI
+# Inisialisasi client khusus Azure
 client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_KEY"),
     api_version="2024-02-15-preview",
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
-deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # Nama deployment Azure kamu
+# Deployment ID harus string dan tidak None!
+deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     prompt = f"""
@@ -27,8 +28,16 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
     """
 
     try:
+        # DEBUG
+        print("🔧 Deployment ID:", deployment_id)
+        print("🔧 Endpoint:", os.getenv("AZURE_OPENAI_ENDPOINT"))
+        print("🔧 Key:", os.getenv("AZURE_OPENAI_KEY")[:5] + "...")
+        
+        if not deployment_id:
+            return "ERROR: deployment_id kosong! Cek variabel AZURE_OPENAI_DEPLOYMENT"
+
         response = client.chat.completions.create(
-            deployment_id=deployment_id,  # ← Wajib pakai ini untuk Azure
+            deployment_id=deployment_id,  # WAJIB PAKAI INI UNTUK AZURE
             messages=[
                 {"role": "system", "content": "Kamu adalah asisten ahli agronomi untuk tanaman cabai."},
                 {"role": "user", "content": prompt}
@@ -37,7 +46,6 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
             temperature=0.7,
             top_p=1
         )
-
         return response.choices[0].message.content.strip()
 
     except Exception as e:
