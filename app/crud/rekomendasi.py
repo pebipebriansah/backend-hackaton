@@ -9,6 +9,7 @@ client = AzureOpenAI(
 )
 
 deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+model_name = "gpt-4o-mini"  # Replace with your actual model name
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
@@ -29,6 +30,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
 
         response = client.chat.completions.create(
             deployment_id=deployment_id,
+            model=model_name,  # Add the model parameter
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
