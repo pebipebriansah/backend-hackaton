@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.schemas.rekomendasi import RekomendasiRequest, RekomendasiResponse
 from app.crud.rekomendasi import generate_rekomendasi_openai
 
+# Jangan pakai prefix di sini
 router = APIRouter()
 
 @router.post("/", response_model=RekomendasiResponse)

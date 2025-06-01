@@ -4,7 +4,7 @@ import os
 openai.api_type = "azure"
 openai.api_version = "2024-02-15-preview"  # atau sesuai versi Azure kamu
 openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT")  # contoh: https://myopenai.openai.azure.com
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     prompt = f"""
