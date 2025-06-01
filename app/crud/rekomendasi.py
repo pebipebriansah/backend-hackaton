@@ -8,12 +8,11 @@ client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
-deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-model_name = "gpt-4o-mini"  # Replace with your actual model name
+deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # This should be your deployment name
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
-        if not deployment_id:
+        if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
         prompt = f"""
@@ -29,8 +28,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            deployment_id=deployment_id,
-            model=model_name,  # Add the model parameter
+            model=deployment_name,  # Use the deployment name as the model parameter
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
