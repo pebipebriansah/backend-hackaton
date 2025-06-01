@@ -7,11 +7,11 @@ client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
-deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # e.g., "gpt35-turbo"
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
-        if not deployment_id:
+        if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
         prompt = f"""
@@ -27,7 +27,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            deployment_id=deployment_id,
+            model=deployment_name,  # ✅ PAKAI INI
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
