@@ -1,18 +1,17 @@
 from openai import AzureOpenAI
 import os
 
-# Pastikan ini tidak None
 client = AzureOpenAI(
     api_key=os.getenv("AZURE_OPENAI_KEY"),
     api_version="2024-02-15-preview",
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
+deployment_id = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
-        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # This should be your deployment name
-        if not deployment_name:
+        if not deployment_id:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
         prompt = f"""
@@ -28,7 +27,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            model="ai-hackaton-petani",  # Use the deployment name as the model parameter
+            deployment_id=deployment_id,
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
@@ -36,6 +35,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
             max_tokens=500,
             temperature=0.7
         )
+
         return response.choices[0].message.content.strip()
 
     except Exception as e:
