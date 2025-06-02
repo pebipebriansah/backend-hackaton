@@ -14,7 +14,6 @@ HUJAN_THRESHOLD = 0.1  # Minimal curah hujan dianggap hujan
 
 @router.post("/", response_model=CuacaOut)
 def create_cuaca(data: CuacaCreate, db: Session = Depends(get_db)):
-    # Simpan data cuaca ke database
     db_cuaca = Cuaca(
         id_petani=data.id_petani,
         lokasi=data.lokasi,
@@ -27,7 +26,6 @@ def create_cuaca(data: CuacaCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_cuaca)
 
-    # Setelah disimpan, hitung rekomendasi
     tanggal_7_hari_lalu = datetime.utcnow() - timedelta(days=7)
     data_cuaca_7_hari = (
         db.query(Cuaca)
@@ -61,7 +59,14 @@ def create_cuaca(data: CuacaCreate, db: Session = Depends(get_db)):
         else:
             rekomendasi = "Curah hujan normal, lanjutkan perawatan tanaman seperti biasa."
 
-    # Update rekomendasi pada response object (bukan di DB)
-    db_cuaca.rekomendasi = rekomendasi
+    return CuacaOut(
+        id_cuaca=db_cuaca.id_cuaca,
+        id_petani=db_cuaca.id_petani,
+        lokasi=db_cuaca.lokasi,
+        latitude=db_cuaca.latitude,
+        longitude=db_cuaca.longitude,
+        curah_hujan=db_cuaca.curah_hujan,
+        created_at=db_cuaca.created_at,
+        rekomendasi=rekomendasi
+    )
 
-    return db_cuaca
