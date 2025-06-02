@@ -7,7 +7,7 @@ Base = declarative_base()
 class Cuaca(Base):
     __tablename__ = "cuaca"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id_cuaca = Column(Integer, primary_key=True, index=True)
     id_petani = Column(Integer, ForeignKey("tbl_petani.id_petani"), nullable=False)
     lokasi = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
