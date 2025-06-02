@@ -40,7 +40,7 @@ def login(petani: PetaniLogin, db: Session = Depends(get_db)):
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "id_petani": db_petani.id,           # <-- tambahkan ini
+        "id_petani": db_petani.id_petani,           # <-- tambahkan ini
         "email": db_petani.email,
         "nama_petani": db_petani.nama_petani
     }
