@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from app.database import get_db
 from app.schemas.cuaca import CuacaCreate, CuacaOut
-from app.models import Cuaca  # model ORM tabel cuaca
+from app.models.cuaca import Cuaca  # model ORM tabel cuaca
 
 router = APIRouter(
     prefix="/cuaca",
