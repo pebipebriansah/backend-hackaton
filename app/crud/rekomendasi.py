@@ -20,12 +20,18 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
         prompt = f"""
-                Kamu adalah ahli agronomi yang berpengalaman dalam penyakit tanaman cabai.  
-                Berdasarkan keluhan petani berikut: "{keluhan}", jelaskan secara singkat kemungkinan penyebabnya,  
-                berikan rekomendasi pengobatan dengan bahan alami dan kimia (jika perlu),  
-                serta berikan tips pencegahan agar penyakit tidak menyebar.  
-                Gunakan bahasa Indonesia yang mudah dimengerti oleh petani.
-                """
+        Kamu adalah ahli agronomi. Jawablah keluhan petani di bawah ini dengan format yang jelas dan terstruktur sebagai berikut:
+
+        Nama Penyakit: ...
+        Penyebab: ...
+        Pengobatan: ...
+        Pencegahan: ...
+
+        Keluhan petani: "{keluhan}"
+
+        Jawaban harus dalam bahasa Indonesia dan mudah dimengerti petani.
+        """
+
 
         response = client.chat.completions.create(
             model=deployment_name,  # ✅ Gunakan nama deployment dari environment
