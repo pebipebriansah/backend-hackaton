@@ -17,10 +17,8 @@ def get_harga_bulan_ini_dan_lalu(db: Session):
 
     return db.query(Harga).filter(
         (
-            (extract('month', Harga.created_at) == bulan_ini) &
-            (extract('year', Harga.created_at) == tahun_ini)
+            (Harga.bulan == bulan_ini) & (Harga.tahun == tahun_ini)
         ) | (
-            (extract('month', Harga.created_at) == bulan_lalu) &
-            (extract('year', Harga.created_at) == tahun_lalu)
+            (Harga.bulan == bulan_lalu) & (Harga.tahun == tahun_lalu)
         )
     ).all()
