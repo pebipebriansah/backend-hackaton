@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
 
-from app.models import Harga
+from app.models.harga import Harga
 
 def get_harga_bulan_ini_dan_lalu(db: Session):
     today = datetime.today()
