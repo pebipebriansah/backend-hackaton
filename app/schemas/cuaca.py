@@ -7,7 +7,7 @@ class CuacaCreate(BaseModel):
     latitude: float
     longitude: float
     curah_hujan: float
-    create_at: datetime
+    created_at: datetime
 
 class CuacaOut(CuacaCreate):
     id_cuaca: int
