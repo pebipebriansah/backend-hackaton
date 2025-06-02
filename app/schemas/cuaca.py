@@ -8,12 +8,20 @@ class CuacaCreate(BaseModel):
     latitude: float
     longitude: float
     curah_hujan: float
-    created_at: Optional[datetime] = None  # tidak wajib diisi
+    created_at: Optional[datetime] = None  # Jika tidak dikirim, bisa di-set otomatis di DB
 
-class CuacaOut(CuacaCreate):
+class CuacaOut(BaseModel):
     id_cuaca: int
-    rekomendasi: str | None = None
+    id_petani: int
+    lokasi: str
+    latitude: float
+    longitude: float
+    curah_hujan: float
+    rekomendasi: Optional[str] = None
     created_at: datetime
 
     class Config:
         orm_mode = True
+
+class CuacaRekomendasiResponse(BaseModel):
+    rekomendasi: str
