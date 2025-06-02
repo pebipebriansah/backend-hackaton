@@ -11,6 +11,7 @@ class TokenData(BaseModel):
 class TokenWithInfo(TokenData):
     email: EmailStr
     nama_petani: str
+    id : int
 
 class PetaniRegister(BaseModel):
     nama_petani: str
