@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
 
 class CuacaCreate(BaseModel):
@@ -7,7 +8,7 @@ class CuacaCreate(BaseModel):
     latitude: float
     longitude: float
     curah_hujan: float
-    created_at: datetime
+    created_at: Optional[datetime] = None  # tidak wajib diisi
 
 class CuacaOut(CuacaCreate):
     id_cuaca: int
