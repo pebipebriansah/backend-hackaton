@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.crud import harga as crud
+from app.crud.harga import harga as crud
 from app.schemas.harga import HargaRingkasResponse  # sesuaikan nama
 
 router = APIRouter(prefix="/harga", tags=["Harga"])
