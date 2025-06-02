@@ -2,8 +2,8 @@ from openai import AzureOpenAI
 import os
 
 client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2024-02-15-preview",
+    api_key=os.getenv("AZURE_OPENAI_0KEY"),
+    api_version="2025-02-15-preview",
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
@@ -27,7 +27,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            model=deployment_name,  # ✅ PAKAI INI
+            model="gpt-35-turbo",  # ✅ PAKAI INI
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
