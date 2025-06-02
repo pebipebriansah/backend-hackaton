@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
-from schemas.cuaca import CuacaCreate, CuacaOut
-from crud import cuaca as crud_cuaca
+from app.database import get_db
+from app.schemas.cuaca import CuacaCreate, CuacaOut
+from app.crud import cuaca as crud_cuaca
 
 router = APIRouter(
     prefix="/cuaca",
