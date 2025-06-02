@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.cuaca import Cuaca
-from schemas.cuaca import CuacaCreate
+from app.models.cuaca import Cuaca
+from app.schemas.cuaca import CuacaCreate
 from datetime import datetime, timedelta
 
 def simpan_cuaca(db: Session, data: CuacaCreate):
