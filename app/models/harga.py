@@ -3,7 +3,7 @@ from datetime import datetime
 from app.database import Base
 
 class Harga(Base):
-    __tablename__ = "harga"
+    __tablename__ = "tabel_harga"
 
     id_harga = Column(Integer, primary_key=True, index=True)
     bulan = Column(String, nullable=False)
