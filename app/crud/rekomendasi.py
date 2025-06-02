@@ -1,13 +1,18 @@
 from openai import AzureOpenAI
 import os
 
-client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2025-02-15-preview",
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
-)
+# Load environment variables
+api_key = os.getenv("AZURE_OPENAI_KEY")
+endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # Contoh: "pebipebriansah160200-4292"
+api_version = "2024-05-01-preview"  # ✅ Versi terbaru untuk GPT-4o
 
-deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # e.g., "gpt35-turbo"
+# Inisialisasi klien Azure OpenAI
+client = AzureOpenAI(
+    api_key=api_key,
+    azure_endpoint=endpoint,
+    api_version=api_version
+)
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
@@ -27,7 +32,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         """
 
         response = client.chat.completions.create(
-            model="gpt-35-turbo",  # ✅ PAKAI INI
+            model=deployment_name,  # ✅ Gunakan nama deployment dari environment
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
