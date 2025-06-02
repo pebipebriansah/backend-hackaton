@@ -60,7 +60,7 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
                 {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500,
+            max_tokens=1000,
             temperature=0.7
         )
 
