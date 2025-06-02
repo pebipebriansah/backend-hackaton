@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import extract
-from models.harga import Harga
+from app.models.harga import Harga
 from datetime import datetime, timedelta
 
 def get_harga_bulan_ini_dan_lalu(db: Session):
