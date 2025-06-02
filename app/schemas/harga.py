@@ -1,14 +1,10 @@
 from pydantic import BaseModel
-from datetime import datetime
 
-class HargaResponse(BaseModel):
-    id_harga: int
-    bulan: int  # jika di DB bulan disimpan sebagai integer
-    tahun: int
-    curah_hujan: float
-    harga: float
-    sumber: str
-    created_at: datetime
+class HargaRingkasResponse(BaseModel):
+    harga_bulan_ini: float
+    harga_bulan_lalu: float
+    # Optional: tambahkan tren jika dibutuhkan
+    # tren: str
 
     class Config:
         orm_mode = True
