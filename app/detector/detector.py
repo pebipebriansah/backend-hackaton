@@ -27,13 +27,13 @@ model = keras.models.load_model(model_path)
 class_names = ["thrips", "virus_kuning", "bercak_daun"]
 
 def predict_disease(image_bytes: bytes) -> dict:
-    # Baca gambar dari bytes, ubah ke RGB, resize
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    # Baca gambar dari bytes, ubah ke RGBA (4 channel), resize
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
     image = image.resize((224, 224))
 
     # Preprocessing: ubah ke array dan normalisasi
     image_array = np.array(image) / 255.0
-    image_array = np.expand_dims(image_array, axis=0)  # Tambahkan batch dimensi
+    image_array = np.expand_dims(image_array, axis=0)  # Tambah batch dimensi
 
     # Prediksi
     prediction = model.predict(image_array)
@@ -44,3 +44,4 @@ def predict_disease(image_bytes: bytes) -> dict:
         "class": class_names[predicted_class],
         "confidence": confidence
     }
+
