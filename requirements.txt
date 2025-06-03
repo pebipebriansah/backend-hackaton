@@ -14,7 +14,9 @@ httpx
 openai>=1.0.0
 scikit-learn
 huggingface_hub
-jax
-jaxlib
 pillow
+keras==3.3.2
+jax==0.4.25
+jaxlib==0.4.25
+
 
