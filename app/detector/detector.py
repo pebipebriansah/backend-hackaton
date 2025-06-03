@@ -1,6 +1,9 @@
 import os
 import httpx
 from fastapi import HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
 
 HF_API_URL = "https://api-inference.huggingface.co/models/pebipebriansah16/deteksi-cabai"
 HF_TOKEN = os.getenv("HF_TOKEN")
