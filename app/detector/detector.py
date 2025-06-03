@@ -1,40 +1,42 @@
 import os
 
-# Set backend JAX harus dilakukan **sebelum** import keras
+# Set backend JAX sebelum import keras
 os.environ["KERAS_BACKEND"] = "jax"
 
-from huggingface_hub import login
+from huggingface_hub import login, hf_hub_download
 import keras
 import numpy as np
 from PIL import Image
 import io
 
-# Login ke Hugging Face dengan token dari environment variable
+# Login ke Hugging Face dengan token (jika disediakan)
 token = os.environ.get("HF_TOKEN")
 if token:
     login(token)
 
-# Load model dari Hugging Face sekali saja saat import module
-model = keras.saving.load_model("hf://pebipebriansah16/deteksi-cabai")
+# Unduh model dari Hugging Face hanya sekali, cache otomatis
+model_path = hf_hub_download(
+    repo_id="pebipebriansah16/deteksi-cabai",
+    filename="Modelpenyakitcabai.keras"  # Ganti dengan nama file model Anda
+)
+
+# Load model hanya sekali saat modul pertama kali dijalankan
+model = keras.models.load_model(model_path)
 
 # Mapping label kelas
 class_names = ["thrips", "virus_kuning", "bercak_daun"]
 
 def predict_disease(image_bytes: bytes) -> dict:
-    # Load gambar dari bytes, ubah ke RGB dan resize sesuai model
+    # Baca gambar dari bytes, ubah ke RGB, resize
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     image = image.resize((224, 224))
 
-    # Preprocess: ubah ke numpy array dan normalisasi
+    # Preprocessing: ubah ke array dan normalisasi
     image_array = np.array(image) / 255.0
+    image_array = np.expand_dims(image_array, axis=0)  # Tambahkan batch dimensi
 
-    # Tambah batch dimension: (1, 224, 224, 3)
-    image_array = np.expand_dims(image_array, axis=0)
-
-    # Prediksi menggunakan model Keras
+    # Prediksi
     prediction = model.predict(image_array)
-
-    # Ambil kelas dengan probabilitas tertinggi
     predicted_class = int(np.argmax(prediction, axis=1)[0])
     confidence = float(np.max(prediction))
 
