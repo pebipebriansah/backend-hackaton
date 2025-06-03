@@ -1,47 +1,32 @@
 import os
+import httpx
+from fastapi import FastAPI, File, UploadFile, HTTPException
 
-# Set backend JAX sebelum import keras
-os.environ["KERAS_BACKEND"] = "jax"
+app = FastAPI()
 
-from huggingface_hub import login, hf_hub_download
-import keras
-import numpy as np
-from PIL import Image
-import io
+# URL inference API Hugging Face (ganti sesuai repo dan model kamu)
+HF_API_URL = "https://api-inference.huggingface.co/models/pebipebriansah16/deteksi-cabai"
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-# Login ke Hugging Face dengan token (jika disediakan)
-token = os.environ.get("HF_TOKEN")
-if token:
-    login(token)
+headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
 
-# Unduh model dari Hugging Face hanya sekali, cache otomatis
-model_path = hf_hub_download(
-    repo_id="pebipebriansah16/deteksi-cabai",
-    filename="Modelpenyakitcabai.keras"  # Ganti dengan nama file model Anda
-)
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    if not HF_TOKEN:
+        raise HTTPException(status_code=500, detail="HF_TOKEN environment variable is not set")
 
-# Load model hanya sekali saat modul pertama kali dijalankan
-model = keras.models.load_model(model_path)
+    image_bytes = await file.read()
 
-# Mapping label kelas
-class_names = ["thrips", "virus_kuning", "bercak_daun"]
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            HF_API_URL,
+            headers=headers,
+            files={"file": (file.filename, image_bytes, file.content_type)}
+        )
+    
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f"Hugging Face API error: {response.text}")
 
-def predict_disease(image_bytes: bytes) -> dict:
-    # Baca gambar dari bytes, ubah ke RGBA (4 channel), resize
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
-    image = image.resize((224, 224))
-
-    # Preprocessing: ubah ke array dan normalisasi
-    image_array = np.array(image) / 255.0
-    image_array = np.expand_dims(image_array, axis=0)  # Tambah batch dimensi
-
-    # Prediksi
-    prediction = model.predict(image_array)
-    predicted_class = int(np.argmax(prediction, axis=1)[0])
-    confidence = float(np.max(prediction))
-
-    return {
-        "class": class_names[predicted_class],
-        "confidence": confidence
-    }
-
+    result = response.json()
+    # Result tergantung output model kamu, sesuaikan parsing di sini
+    return {"result": result}
