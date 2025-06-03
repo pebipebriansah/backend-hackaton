@@ -13,4 +13,8 @@ passlib[bcrypt]==1.7.4
 httpx
 openai>=1.0.0
 scikit-learn
+huggingface_hub
+jax
+jaxlib
+pillow
 

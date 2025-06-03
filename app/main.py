@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import router dari package app.routes
-from app.routes import authPetani, petani, rekomendasi, cuaca, harga  # ✅ Tambahkan harga
+from app.routes import authPetani, petani, rekomendasi, cuaca, harga, predict  # ✅ Tambahkan predict
 
 # Import database dari app.database
 from app.database import Base, engine
@@ -38,3 +38,4 @@ app.include_router(petani.router, prefix="/petani", tags=["Petani"])
 app.include_router(rekomendasi.router, prefix="/rekomendasi", tags=["Rekomendasi"])
 app.include_router(cuaca.router, prefix="/cuaca", tags=["Cuaca"])
 app.include_router(harga.router, prefix="/harga", tags=["Harga"])  # ✅ Tambahkan router harga
+app.include_router(predict.router, prefix="/deteksi", tags=["Deteksi"])  # ✅ Perbaikan di sini
