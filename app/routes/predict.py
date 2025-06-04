@@ -5,20 +5,25 @@ router = APIRouter()
 
 @router.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # Validasi tipe file, hanya image yang diterima
-    if not file.content_type.startswith("image/"):
+    # Validasi jenis file
+    if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File harus berupa gambar")
 
-    # Baca file sebagai bytes
-    image_bytes = await file.read()
-
     try:
-        result = await predict_disease(image_bytes)
-    except HTTPException as e:
-        # Forward HTTPException dari predict_disease
-        raise e
-    except Exception as e:
-        # Tangani error lain
-        raise HTTPException(status_code=500, detail=str(e))
+        # Baca isi file sebagai bytes
+        image_bytes = await file.read()
 
-    return {"result": result}
+        # Panggil fungsi deteksi
+        result = await predict_disease(image_bytes)
+
+        return {
+            "success": True,
+            "message": "Prediksi berhasil",
+            "data": result
+        }
+
+    except HTTPException as http_error:
+        raise http_error
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Terjadi kesalahan saat memproses gambar: {str(e)}")

@@ -18,5 +18,6 @@ pillow
 keras
 jax
 jaxlib
+gradio_client
 
 
