@@ -10,5 +10,4 @@ class Cuaca(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     curah_hujan = Column(Float, nullable=False)
-    rekomendasi = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

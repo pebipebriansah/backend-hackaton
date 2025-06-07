@@ -4,7 +4,7 @@ from app.database import get_db
 from app.crud import harga as crud
 from app.schemas.harga import HargaRingkasResponse  # sesuaikan nama
 
-router = APIRouter(prefix="/harga", tags=["Harga"])
+router = APIRouter()
 
 @router.get("/", response_model=HargaRingkasResponse)
 def read_harga_bulan_ini_lalu(db: Session = Depends(get_db)):

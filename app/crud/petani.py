@@ -4,6 +4,7 @@ from app.utils.security import hash_password
 
 def get_petani_by_email(db: Session, email: str):
     return db.query(Petani).filter(Petani.email == email).first()
+
 def create_petani(db: Session, petani_data):
     hashed_pw = hash_password(petani_data.password)
     db_petani = Petani(

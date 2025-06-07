@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 from typing import Optional
-
-
 class HargaRingkasResponse(BaseModel):
     harga_bulan_ini: float
     harga_bulan_lalu: float
