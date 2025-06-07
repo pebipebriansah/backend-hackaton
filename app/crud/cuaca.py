@@ -20,3 +20,5 @@ def simpan_cuaca(db: Session, data: CuacaCreate):
     db.commit()
     db.refresh(cuaca_baru)
     return cuaca_baru
+def get_cuaca_by_petani(db: Session, id_petani: int) -> List[Cuaca]:
+    return db.query(Cuaca).filter(Cuaca.id_petani == id_petani).order_by(Cuaca.created_at.desc()).all()
