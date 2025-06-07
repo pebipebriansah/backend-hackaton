@@ -18,6 +18,7 @@ app = FastAPI(
 origins = [
     "http://localhost:5173",  # Untuk development 
     "http://localhost:5000",
+    "http://localhost:8081",
     "https://salmon-sky-06cf0f700.6.azurestaticapps.net",  # Untuk production di Azure Static Web Apps
     
 ]
