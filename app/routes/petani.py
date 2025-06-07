@@ -53,6 +53,7 @@ def login(petani: PetaniLogin, db: Session = Depends(get_db)):
         "nama_petani": db_petani.nama_petani,
         "foto_profil": db_petani.foto_profil,
         "alamat": db_petani.alamat,
+        "telepon": db_petani.telepon,
     }
 # ========== UPDATE DATA PETANI ==========
 @router.put("/update/{id_petani}", response_model=PetaniResponse)
