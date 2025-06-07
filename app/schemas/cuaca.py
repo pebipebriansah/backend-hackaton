@@ -17,7 +17,6 @@ class CuacaOut(BaseModel):
     latitude: float
     longitude: float
     curah_hujan: float
-    rekomendasi: Optional[str] = None
     created_at: datetime
 class CuacaRekomendasiResponse(BaseModel):
     rekomendasi: str
