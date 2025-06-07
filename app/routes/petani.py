@@ -7,7 +7,8 @@ from passlib.context import CryptContext
 from app.database import get_db, SessionLocal
 from app.schemas.petani import PetaniRegister, PetaniLogin, PetaniResponse, TokenWithInfo, PetaniUpdate
 from app.models.petani import Petani
-from app.crud.petani import create_petani, get_petani_by_email, update_petani
+from app.crud.petani import create_petani, get_petani_by_email
+from app.crud.petani import update_petani as update_petani_crud
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
@@ -59,8 +60,7 @@ def login(petani: PetaniLogin, db: Session = Depends(get_db)):
 @router.put("/update/{id_petani}", response_model=PetaniResponse)
 def update_petani(id_petani: int, petani_data: PetaniUpdate, db: Session = Depends(get_db)):
     db_petani = db.query(Petani).filter(Petani.id_petani == id_petani).first()
+    updated_petani = update_petani_crud(db, id_petani, petani_data)
     if not db_petani:
         raise HTTPException(status_code=404, detail="Petani not found")
-
-    updated_petani = update_petani(db, petani_data)
     return updated_petani
