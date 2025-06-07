@@ -19,6 +19,7 @@ class PetaniRegister(BaseModel):
     email: EmailStr
     telepon: str
     password: str
+    foto_profil: str | None = None
     
 class PetaniResponse(BaseModel):
     id_petani: int
@@ -26,6 +27,13 @@ class PetaniResponse(BaseModel):
     alamat: str
     email: EmailStr
     telepon: str
-
+    foto_profil: str | None = None
+class PetaniUpdate(BaseModel):
+    nama_petani: str | None = None
+    alamat: str | None = None
+    email: EmailStr | None = None
+    telepon: str | None = None
+    foto_profil: str | None = None
+    
     class Config:
         from_attributes = True

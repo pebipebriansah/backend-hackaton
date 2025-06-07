@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import authPetani, petani, rekomendasi, cuaca, harga, predict
+from app.routes import petani, rekomendasi, cuaca, harga, predict
 from app.database import Base, engine
 
 # Inisialisasi database
@@ -31,8 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Daftarkan semua router
-app.include_router(authPetani.router, prefix="/auth", tags=["Auth"])
 app.include_router(petani.router, prefix="/petani", tags=["Petani"])
 app.include_router(rekomendasi.router, prefix="/rekomendasi", tags=["Rekomendasi"])
 app.include_router(cuaca.router, prefix="/cuaca", tags=["Cuaca"])

@@ -10,3 +10,4 @@ class Petani(Base):
     email = Column(String, unique=True, index=True)
     telepon = Column(String)
     password = Column(String)
+    foto_profil = Column(String, nullable=True)
