@@ -12,7 +12,6 @@ def simpan_cuaca(db: Session, data: CuacaCreate):
         latitude=data.latitude,
         longitude=data.longitude,
         curah_hujan=data.curah_hujan,
-        rekomendasi=None,  # Kosongkan atau hilangkan jika tidak diperlukan di model
         created_at=sekarang
     )
 
