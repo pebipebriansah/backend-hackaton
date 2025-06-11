@@ -17,7 +17,7 @@ app = FastAPI(
 # Konfigurasi CORS agar bisa diakses dari frontend React (local & Azure)
 origins = [
     "http://localhost:5173",  # Untuk development
-    "https://black-ocean-052327300.6.azurestaticapps.net,
+    "https://black-ocean-052327300.6.azurestaticapps.net",
     "https://salmon-sky-06cf0f700.6.azurestaticapps.net",  # Untuk production di Azure Static Web Apps
     
 ]
