@@ -64,3 +64,8 @@ def update_petani(id_petani: int, petani_data: PetaniUpdate, db: Session = Depen
     if not db_petani:
         raise HTTPException(status_code=404, detail="Petani not found")
     return updated_petani
+    
+# ========== VERIFIKASI TOKEN ==========
+@router.get("/me", response_model=PetaniResponse)
+def read_petani_me(current_petani: Petani = Depends(get_current_petani)):
+    return current_petani
