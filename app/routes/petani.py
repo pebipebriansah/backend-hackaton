@@ -24,6 +24,27 @@ def create_access_token(data: dict, expires_delta: timedelta):
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# Get Current Petani
+def get_current_petani(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Petani:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    petani = db.query(Petani).filter(Petani.email == email).first()
+    if petani is None:
+        raise credentials_exception
+    return petani
+    
 # ========== REGISTER ==========
 @router.post("/register", response_model=PetaniResponse)
 def register_petani(petani: PetaniRegister, db: Session = Depends(get_db)):
