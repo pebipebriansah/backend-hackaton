@@ -19,7 +19,6 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
-        # Keyword sederhana untuk validasi keluhan penyakit cabai
         keywords = [
             "cabai", "cabe", "cabai rawit", "tanaman cabai", "daun", "bunga", "buah", "batang", "akar",
             "penyakit", "hama", "jamur", "virus", "bakteri", "thrips", "kutu kebul", "kutu daun", "ulat",
@@ -37,27 +36,36 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
 
         keluhan_lower = keluhan.lower()
 
-        # Cek apakah setidaknya ada satu keyword dalam keluhan
         if not any(keyword in keluhan_lower for keyword in keywords):
             return "Mohon maaf, sistem hanya dapat memberikan rekomendasi untuk penyakit cabai."
 
+        # Prompt diperbaiki agar hasil tidak memakai format markdown
         prompt = f"""
-        Kamu adalah ahli agronomi. Jawablah keluhan petani di bawah ini dengan format yang jelas dan terstruktur sebagai berikut:
+Anda adalah seorang ahli agronomi tanaman cabai. Tugas Anda adalah membantu petani cabai dengan menjawab keluhan mereka secara jelas, lengkap, dan mudah dimengerti.
 
-        Nama Penyakit: ...
-        Penyebab: ...
-        Pengobatan: ...
-        Pencegahan: ...
+Jawaban harus disusun dengan struktur berikut, TANPA menggunakan format markdown, simbol seperti bintang (**), garis miring, atau tanda pagar (#):
 
-        Keluhan petani: "{keluhan}"
+Nama Penyakit: [tuliskan nama penyakit jika diketahui]
+Penyebab: [jelaskan penyebab atau penyebaran penyakit tersebut]
+Pengobatan:
+1. [Langkah pertama pengobatan]
+2. [Langkah kedua pengobatan]
+dst...
 
-        Jawaban harus dalam bahasa Indonesia dan mudah dimengerti petani.
-        """
+Pencegahan:
+1. [Langkah pertama pencegahan]
+2. [Langkah kedua pencegahan]
+dst...
+
+Pastikan jawaban ditulis dalam bahasa Indonesia yang sederhana dan mudah dimengerti oleh petani.
+
+Keluhan petani: "{keluhan}"
+"""
 
         response = client.chat.completions.create(
             model=deployment_name,
             messages=[
-                {"role": "system", "content": "Kamu adalah ahli agronomi tanaman cabai."},
+                {"role": "system", "content": "Anda adalah ahli agronomi tanaman cabai yang bertugas membantu petani dengan rekomendasi praktis dan mudah dipahami."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=1000,
@@ -68,4 +76,5 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
 
     except Exception as e:
         return f"Terjadi kesalahan saat memproses rekomendasi: {e}"
+
 
