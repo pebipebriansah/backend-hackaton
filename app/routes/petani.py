@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from jose import jwt
 from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
 
 from app.database import get_db, SessionLocal
 from app.schemas.petani import PetaniRegister, PetaniLogin, PetaniResponse, TokenWithInfo, PetaniUpdate
@@ -10,6 +11,7 @@ from app.models.petani import Petani
 from app.crud.petani import create_petani, get_petani_by_email
 from app.crud.petani import update_petani as update_petani_crud
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
