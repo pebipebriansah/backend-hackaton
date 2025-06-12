@@ -39,7 +39,6 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         if not any(keyword in keluhan_lower for keyword in keywords):
             return "Mohon maaf, sistem hanya dapat memberikan rekomendasi untuk penyakit cabai."
 
-        # Prompt diperbaiki agar hasil tidak memakai format markdown
         prompt = f"""
 Anda adalah seorang ahli agronomi tanaman cabai. Tugas Anda adalah membantu petani cabai dengan menjawab keluhan mereka secara jelas, lengkap, dan mudah dimengerti.
 
@@ -57,7 +56,11 @@ Pencegahan:
 2. [Langkah kedua pencegahan]
 dst...
 
-Pastikan jawaban ditulis dalam bahasa Indonesia yang sederhana dan mudah dimengerti oleh petani.
+Berikan juga informasi tambahan berikut:
+- Obat herbal alami yang bisa digunakan oleh petani sebagai alternatif pengendalian hama atau penyakit, lengkap dengan cara membuat dan cara aplikasinya jika memungkinkan.
+- Jenis bahan kimia (insektisida atau fungisida) yang umum digunakan di Indonesia untuk kasus tersebut, sebutkan juga nama bahan aktifnya dan waktu aplikasi yang tepat.
+
+Jawaban harus dalam bahasa Indonesia yang sederhana dan bisa dipahami oleh petani.
 
 Keluhan petani: "{keluhan}"
 """
@@ -68,7 +71,7 @@ Keluhan petani: "{keluhan}"
                 {"role": "system", "content": "Anda adalah ahli agronomi tanaman cabai yang bertugas membantu petani dengan rekomendasi praktis dan mudah dipahami."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000,
+            max_tokens=1200,
             temperature=0.7
         )
 
