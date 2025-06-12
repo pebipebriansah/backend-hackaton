@@ -5,7 +5,7 @@ import os
 api_key = os.getenv("AZURE_OPENAI_KEY")
 endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # Contoh: "pebipebriansah160200-4292"
-api_version = "2024-05-01-preview"  # ✅ Versi terbaru untuk GPT-4o
+api_version = "2024-05-01-preview"
 
 # Inisialisasi klien Azure OpenAI
 client = AzureOpenAI(
@@ -19,48 +19,28 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
-        keywords = [
-            "cabai", "cabe", "cabai rawit", "tanaman cabai", "daun", "bunga", "buah", "batang", "akar",
-            "penyakit", "hama", "jamur", "virus", "bakteri", "thrips", "kutu kebul", "kutu daun", "ulat",
-            "kumbang", "wereng", "kutu putih", "embun tepung", "bercak", "bintik", "keriting", "layu",
-            "busuk", "kuning", "coklat", "hitam", "bercak hitam", "bercak coklat", "bercak kuning", 
-            "bercak putih", "jamur tepung", "jamur akar", "layu fusarium", "layu bakteri", "penyakit virus", 
-            "mosaik", "virus kuning", "virus keriting", "penggerek buah", "penggerek batang", "busuk buah", 
-            "busuk pangkal batang", "antraknosa", "bercak daun", "daun menguning", "daun keriting", 
-            "daun melengkung", "daun bergelombang", "daun mengering", "bercak air basah", "bercak berlendir", 
-            "bercak berlubang", "serangan hama", "serangga", "kutu", "ulat grayak", "ulat bulu", "ulat daun", 
-            "pengendalian hama", "insektisida", "fungisida", "pestisida", "pengobatan tanaman", "gejala penyakit",
-            "penyebaran penyakit", "kerusakan daun", "tanaman terserang", "pertumbuhan terganggu", "tanaman layu", 
-            "tanaman mati", "tanaman sakit", "gejala serangan hama", "serangan kutu kebul", "serangan thrips"
-        ]
+        # Gunakan pemeriksaan minimal, tapi tetap aman
+        if len(keluhan.strip()) < 10:
+            return "Mohon tuliskan keluhan secara lebih lengkap agar sistem bisa memberikan rekomendasi yang akurat."
 
-        keluhan_lower = keluhan.lower()
-
-        if not any(keyword in keluhan_lower for keyword in keywords):
-            return "Mohon maaf, sistem hanya dapat memberikan rekomendasi untuk penyakit cabai."
-
+        # Prompt lebih fleksibel
         prompt = f"""
-Anda adalah seorang ahli agronomi tanaman cabai. Tugas Anda adalah membantu petani cabai dengan menjawab keluhan mereka secara jelas, lengkap, dan mudah dimengerti.
+Kamu adalah seorang ahli agronomi khusus tanaman cabai. Tugasmu adalah memberikan analisis dan rekomendasi lengkap berdasarkan keluhan petani, meskipun mereka menggunakan bahasa sehari-hari.
 
-Jawaban harus disusun dengan struktur berikut, TANPA menggunakan format markdown, simbol seperti bintang (**), garis miring, atau tanda pagar (#):
+**Jika keluhan tidak terkait dengan tanaman cabai, cukup katakan bahwa kamu tidak bisa membantu. Namun jika keluhan menyebut gejala seperti bintik, keriting, menguning, dll, tetap tanggapi sebagai penyakit cabai.**
 
-Nama Penyakit: [tuliskan nama penyakit jika diketahui]
-Penyebab: [jelaskan penyebab atau penyebaran penyakit tersebut]
+Gunakan struktur sebagai berikut TANPA markdown atau simbol aneh:
+
+Nama Penyakit: [Isi]
+Penyebab: [Isi]
 Pengobatan:
-1. [Langkah pertama pengobatan]
-2. [Langkah kedua pengobatan]
-dst...
-
+1. [Isi]
+2. ...
 Pencegahan:
-1. [Langkah pertama pencegahan]
-2. [Langkah kedua pencegahan]
-dst...
-
-Berikan juga informasi tambahan berikut:
-- Obat herbal alami yang bisa digunakan oleh petani sebagai alternatif pengendalian hama atau penyakit, lengkap dengan cara membuat dan cara aplikasinya jika memungkinkan.
-- Jenis bahan kimia (insektisida atau fungisida) yang umum digunakan di Indonesia untuk kasus tersebut, sebutkan juga nama bahan aktifnya dan waktu aplikasi yang tepat.
-
-Jawaban harus dalam bahasa Indonesia yang sederhana dan bisa dipahami oleh petani.
+1. [Isi]
+2. ...
+Obat herbal: [Jika ada]
+Obat kimia: [Sebutkan bahan aktif, bukan merk]
 
 Keluhan petani: "{keluhan}"
 """
@@ -68,16 +48,14 @@ Keluhan petani: "{keluhan}"
         response = client.chat.completions.create(
             model=deployment_name,
             messages=[
-                {"role": "system", "content": "Anda adalah ahli agronomi tanaman cabai yang bertugas membantu petani dengan rekomendasi praktis dan mudah dipahami."},
+                {"role": "system", "content": "Kamu adalah ahli penyakit tanaman cabai. Jawablah dengan bahasa sederhana yang mudah dimengerti petani."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=1200,
-            temperature=0.7
+            temperature=0.6
         )
 
         return response.choices[0].message.content.strip()
 
     except Exception as e:
-        return f"Terjadi kesalahan saat memproses rekomendasi: {e}"
-
-
+        return f"Terjadi kesalahan saat memproses rekomendasi: {str(e)}"
