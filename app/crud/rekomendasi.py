@@ -19,11 +19,28 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
         if not deployment_name:
             raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
 
-        # Gunakan pemeriksaan minimal, tapi tetap aman
-        if len(keluhan.strip()) < 10:
-            return "Mohon tuliskan keluhan secara lebih lengkap agar sistem bisa memberikan rekomendasi yang akurat."
+        # Daftar kata kunci diperluas dengan variasi bahasa lokal/tidak baku
+        kata_kunci_valid = [
+            # Umum
+            "cabai", "cabe", "tanaman", "bibit", "daun", "batang", "akar", "buah",
+            # Gejala
+            "bintik", "bercak", "keriting", "keritingan", "menguning", "layu", "busuk", "pecah", "kering",
+            # Bahasa sehari-hari/tidak baku
+            "kuning", "hitam", "item", "lemes", "pucat", "kisut", "gugur", "copot",
+            "benyek", "mekar", "melempem", "gembur", "kriting", "klayu", "kekuningan",
+            # Bahasa lokal kemungkinan
+            "daunna", "kabe", "cak", "cebele", "nguning", "coklatan", "iteman", "potean", "layuan",
+            # Kata tanya yang bisa mengandung maksud gejala
+            "kenapa", "mengapa", "penyebab", "obat", "gimana", "bagaimana", "sakit",
+            # Diagnosa/solusi
+            "penyakit", "pengobatan", "penyemprotan", "pestisida", "herbal", "kimia", "vitamin", "fungisida", "insektisida"
+        ]
 
-        # Prompt lebih fleksibel
+        keluhan_lower = keluhan.lower()
+
+        if not any(kata in keluhan_lower for kata in kata_kunci_valid):
+            return "Mohon tuliskan keluhan secara lebih lengkap dan pastikan menyebutkan kondisi atau gejala pada tanaman cabai."
+
         prompt = f"""
 Kamu adalah seorang ahli agronomi khusus tanaman cabai. Tugasmu adalah memberikan analisis dan rekomendasi lengkap berdasarkan keluhan petani, meskipun mereka menggunakan bahasa sehari-hari.
 
