@@ -19,5 +19,6 @@ keras
 jax
 jaxlib
 gradio_client
+beautifulsoup4
 
 
