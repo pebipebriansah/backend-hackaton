@@ -18,13 +18,18 @@ def get_harga_cabai():
     }
 
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": "Mozilla/5.0 (compatible; HackathonPetaniApp/1.0)",
+        "Accept": "application/json"
     }
 
     try:
         response = requests.get(url, params=params, headers=headers, timeout=10)
         response.raise_for_status()
         json_data = response.json()
+    except requests.exceptions.HTTPError as http_err:
+        raise HTTPException(status_code=response.status_code, detail=f"❌ HTTP Error: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        raise HTTPException(status_code=500, detail=f"❌ Request Error: {req_err}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"❌ Gagal mengambil data: {e}")
 
@@ -35,11 +40,11 @@ def get_harga_cabai():
         if "cabai" in nama or "cabe" in nama:
             try:
                 hasil.append(HargaCabai(
-                    nama=item["name"],
-                    harga=int(item["price"]),
+                    nama=item.get("name", "-"),
+                    harga=int(item.get("price", 0)),
                     satuan=item.get("unit", "kg"),
-                    tanggal=item.get("date", ""),
-                    gambar=item.get("url", "")
+                    kategori=item.get("categories", "-"),
+                    tanggal=item.get("date", "-")
                 ))
             except Exception as e:
                 print(f"⚠️ Gagal parsing item: {e}")
