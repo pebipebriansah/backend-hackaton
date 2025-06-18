@@ -21,23 +21,25 @@ def ambil_harga_cabai():
         response.raise_for_status()
         json_data = response.json()
     except Exception as e:
-        print(f"Error saat mengambil data: {e}")
+        print(f"❌ Error saat mengambil data: {e}")
         return []
 
     hasil = []
     for item in json_data.get("data", []):
         nama = item.get("name", "").lower()
-        if "cabe" in nama or "cabai" in nama:
+        
+        # Ambil hanya yang mengandung kata "cabai" atau "cabe"
+        if "cabai" in nama or "cabe" in nama:
             try:
                 hasil.append({
-                    "nama": item.get("name"),
-                    "harga": int(float(item.get("price", 0))),
+                    "nama": item["name"],
+                    "harga": int(item["price"]),
                     "satuan": item.get("unit", "kg"),
                     "tanggal": item.get("date", ""),
-                    "gambar": item.get("url")  # bisa untuk frontend tampilkan ikon cabai
+                    "gambar": item.get("url", "")
                 })
             except Exception as e:
-                print(f"Gagal parsing {item.get('name')}: {e}")
+                print(f"⚠️ Gagal parsing item {item.get('name', 'Unknown')}: {e}")
                 continue
 
     return hasil
