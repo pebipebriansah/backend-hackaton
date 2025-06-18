@@ -28,16 +28,22 @@ def ambil_harga_cabai():
     for item in data.get("data", []):
         nama = item.get("name", "").lower()
         if "cabe" in nama or "cabai" in nama:
-            harga_bulan_ini = item.get("price") or 0
-            histories = item.get("histories", [])
-            harga_bulan_lalu = histories[0]["price"] if histories else 0
+            try:
+                harga_bulan_ini = int(float(item.get("price", 0)))
+                histories = item.get("histories", [])
+                harga_bulan_lalu = int(float(histories[0].get("price", 0))) if histories else 0
+                satuan = item.get("unit", "kg")
+                tanggal = item.get("date", "")
 
-            hasil.append({
-                "nama": item.get("name", ""),
-                "harga_bulan_ini": int(harga_bulan_ini),
-                "harga_bulan_lalu": int(harga_bulan_lalu),
-                "satuan": item.get("unit", ""),
-                "tanggal": item.get("date", "")
-            })
+                hasil.append({
+                    "nama": item.get("name", "").strip(),
+                    "harga_bulan_ini": harga_bulan_ini,
+                    "harga_bulan_lalu": harga_bulan_lalu,
+                    "satuan": satuan,
+                    "tanggal": tanggal
+                })
+            except Exception as e:
+                print(f"Error parsing item {item.get('name')}: {e}")
+                continue  # skip jika ada data tidak sesuai
 
     return hasil
