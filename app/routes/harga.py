@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas import HargaCabai, HargaCabaiResponse
+from app.schemas.harga import HargaCabaiResponse, HargaCabai
 from app.scrapper import ambil_harga_cabai
 router = APIRouter()
 @router.get("/", response_model=HargaCabaiResponse)
