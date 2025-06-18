@@ -7,6 +7,6 @@ class HargaCabai(BaseModel):
     harga_bulan_lalu: int
     satuan: str
     tanggal: str
+
 class HargaCabaiResponse(BaseModel):
     data: List[HargaCabai]
-    
