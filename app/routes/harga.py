@@ -12,10 +12,8 @@ def get_harga_cabai():
         raise HTTPException(status_code=500, detail="Gagal mengambil data harga cabai.")
     
     try:
-        # Validasi dan konversi ke dict sesuai skema Pydantic
-        harga_cabai_list = [HargaCabai(**item).dict() for item in data_scraped]
-    except ValidationError as e:
-        # Tambahkan log di sini jika perlu
+        harga_cabai_list = [HargaCabai(**item) for item in data_scraped]
+    except ValidationError:
         raise HTTPException(status_code=500, detail="Validasi data harga cabai gagal.")
-
-    return {"data": harga_cabai_list}
+    
+    return HargaCabaiResponse(data=harga_cabai_list)

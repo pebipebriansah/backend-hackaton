@@ -17,33 +17,27 @@ def ambil_harga_cabai():
     }
 
     try:
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.get(url, params=params, headers=headers, timeout=10)
         response.raise_for_status()
-        data = response.json()
+        json_data = response.json()
     except Exception as e:
         print(f"Error saat mengambil data: {e}")
         return []
 
     hasil = []
-    for item in data.get("data", []):
+    for item in json_data.get("data", []):
         nama = item.get("name", "").lower()
         if "cabe" in nama or "cabai" in nama:
             try:
-                harga_bulan_ini = int(float(item.get("price", 0)))
-                histories = item.get("histories", [])
-                harga_bulan_lalu = int(float(histories[0].get("price", 0))) if histories else 0
-                satuan = item.get("unit", "kg")
-                tanggal = item.get("date", "")
-
                 hasil.append({
-                    "nama": item.get("name", "").strip(),
-                    "harga_bulan_ini": harga_bulan_ini,
-                    "harga_bulan_lalu": harga_bulan_lalu,
-                    "satuan": satuan,
-                    "tanggal": tanggal
+                    "nama": item.get("name"),
+                    "harga": int(float(item.get("price", 0))),
+                    "satuan": item.get("unit", "kg"),
+                    "tanggal": item.get("date", ""),
+                    "gambar": item.get("url")  # bisa untuk frontend tampilkan ikon cabai
                 })
             except Exception as e:
-                print(f"Error parsing item {item.get('name')}: {e}")
-                continue  # skip jika ada data tidak sesuai
+                print(f"Gagal parsing {item.get('name')}: {e}")
+                continue
 
     return hasil
