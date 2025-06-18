@@ -10,3 +10,4 @@ class HargaCabai(BaseModel):
 
 class HargaCabaiResponse(BaseModel):
     data: List[HargaCabai]
+    
