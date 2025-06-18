@@ -1,5 +1,3 @@
-# scraper.py
-
 import requests
 
 def ambil_harga_cabai():
@@ -22,13 +20,26 @@ def ambil_harga_cabai():
     data = response.json()
 
     hasil = []
+
     for item in data.get("data", []):
-        hasil.append({
-            "nama": item["name"],
-            "harga": item["price"],
-            "satuan": item["unit"],
-            "kategori": item["categories"],
-            "tanggal": item["date"]
-        })
+        nama = item.get("name", "").lower()
+        if "cabe" in nama or "cabai" in nama:
+            harga_bulan_ini = item["price"]
+            
+            # ambil harga bulan lalu dari histori
+            histories = item.get("histories", [])
+            harga_bulan_lalu = None
+
+            if histories:
+                # ambil harga pada minggu lalu (anggap sebagai harga bulan lalu)
+                harga_bulan_lalu = histories[0]["price"] if len(histories) > 0 else None
+
+            hasil.append({
+                "nama": item["name"],
+                "harga_bulan_ini": harga_bulan_ini,
+                "harga_bulan_lalu": harga_bulan_lalu,
+                "satuan": item["unit"],
+                "tanggal": item["date"]
+            })
 
     return hasil
