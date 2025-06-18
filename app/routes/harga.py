@@ -1,31 +1,51 @@
 from fastapi import APIRouter, HTTPException
 from app.schemas.harga import HargaCabaiResponse, HargaCabai
-from app.scrapper.scrapper import ambil_harga_cabai
-from pydantic import ValidationError
+import requests
 
 router = APIRouter()
 
 @router.get("/", response_model=HargaCabaiResponse, summary="Ambil data harga cabai terbaru")
 def get_harga_cabai():
-    # Ambil data dari scrapper
+    url = "https://data.jabarprov.go.id/api-dashboard-jabar/public/pangan/list-komoditas"
+    params = {
+        "kota": 21,        # Majalengka
+        "pasar": 373,      # Pasar Kadipaten
+        "search": "",
+        "page": 1,
+        "limit": 100,
+        "order": "asc",
+        "order_by": "name"
+    }
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
     try:
-        data_scraped = ambil_harga_cabai()
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+        json_data = response.json()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gagal mengambil data: {e}")
-    
-    if not data_scraped:
-        raise HTTPException(status_code=404, detail="Data harga cabai tidak ditemukan.")
+        raise HTTPException(status_code=500, detail=f"❌ Gagal mengambil data: {e}")
 
-    # Debug log data mentah
-    print("✅ DATA MENTAH:", data_scraped)
+    hasil = []
+    for item in json_data.get("data", []):
+        nama = item.get("name", "").lower()
 
-    try:
-        harga_cabai_list = [HargaCabai(**item) for item in data_scraped]
-    except ValidationError as e:
-        print("❌ VALIDATION ERROR:", e)
-        raise HTTPException(status_code=422, detail="Validasi data harga cabai gagal.")
+        if "cabai" in nama or "cabe" in nama:
+            try:
+                hasil.append(HargaCabai(
+                    nama=item["name"],
+                    harga=int(item["price"]),
+                    satuan=item.get("unit", "kg"),
+                    tanggal=item.get("date", ""),
+                    gambar=item.get("url", "")
+                ))
+            except Exception as e:
+                print(f"⚠️ Gagal parsing item: {e}")
+                continue
 
-    # Debug log data hasil parsing
-    print("✅ DATA TERVALIDASI:", harga_cabai_list)
+    if not hasil:
+        raise HTTPException(status_code=404, detail="❌ Data cabai tidak ditemukan.")
 
-    return HargaCabaiResponse(data=harga_cabai_list)
+    return HargaCabaiResponse(data=hasil)

@@ -8,7 +8,7 @@ python-jose
 azure-functions
 sqlalchemy
 email-validator
-pydantic[email]
+pydantic[all]
 passlib[bcrypt]==1.7.4
 httpx
 openai>=1.0.0

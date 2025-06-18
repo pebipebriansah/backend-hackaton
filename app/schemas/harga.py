@@ -1,14 +1,14 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional
+from pydantic import BaseModel, HttpUrl, validator
+from typing import List, Optional, Union
 
 class HargaCabai(BaseModel):
     nama: str
     harga: int
     satuan: str
     tanggal: str
-    gambar: Optional[HttpUrl] = None  # validasi URL otomatis
-    sumber: Optional[str] = None      # nama instansi, misalnya "Dinas Perindustrian dan Perdagangan"
-    kondisi_harga: Optional[str] = None  # naik / turun / tetap
+    gambar: Optional[Union[HttpUrl, str]] = None  # HttpUrl kadang error kalau file .jpg (non-URL aman)
+    sumber: Optional[str] = None
+    kondisi_harga: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -25,11 +25,15 @@ class HargaCabai(BaseModel):
         }
 
 class HargaCabaiResponse(BaseModel):
+    message: str
+    success: int
     data: List[HargaCabai]
 
     class Config:
         schema_extra = {
             "example": {
+                "message": "Get data successfull",
+                "success": 1,
                 "data": [
                     {
                         "nama": "Cabai Hijau Biasa",
