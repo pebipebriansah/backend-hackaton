@@ -10,6 +10,10 @@ class TokenWithInfo(TokenData):
     email: EmailStr
     nama_petani: str
     id_petani : int
+    telepon: str
+    alamat: str
+    foto_profil: str | None = None
+    
 class PetaniRegister(BaseModel):
     nama_petani: str
     alamat: str
