@@ -36,18 +36,41 @@ def get_current_petani(token: str = Depends(oauth2_scheme), db: Session = Depend
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        # PERBAIKAN: Decode token dengan benar
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        
+        # PERBAIKAN: Pastikan email ada
         if email is None:
             raise credentials_exception
-    except JWTError:
+    except JWTError as e:
+        # PERBAIKAN: Tambahkan logging error
+        print(f"JWT Error: {str(e)}")
         raise credentials_exception
 
-    petani = db.query(Petani).filter(Petani.email == email).first()
+    # PERBAIKAN: Gunakan fungsi yang sudah ada
+    petani = get_petani_by_email(db, email)
     if petani is None:
         raise credentials_exception
     return petani
-    
+
+# ========== PERBAIKAN ENDPOINT /me ==========
+@router.get("/me", response_model=PetaniResponse)
+def read_petani_me(current_petani: Petani = Depends(get_current_petani)):
+    # PERBAIKAN: Kembalikan data dalam format yang benar
+    return {
+        "id_petani": current_petani.id_petani,
+        "nama_petani": current_petani.nama_petani,
+        "email": current_petani.email,
+        "alamat": current_petani.alamat,
+        "telepon": current_petani.telepon,
+        "foto_profil": current_petani.foto_profil
+    }
+
+# ========== TAMBAHKAN ENDPOINT ALTERNATIF ==========
+@router.get("/profile", response_model=PetaniResponse)
+def get_petani_profile(current_petani: Petani = Depends(get_current_petani)):
+    return read_petani_me(current_petani)
 # ========== REGISTER ==========
 @router.post("/register", response_model=PetaniResponse)
 def register_petani(petani: PetaniRegister, db: Session = Depends(get_db)):
