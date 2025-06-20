@@ -37,28 +37,49 @@ def generate_rekomendasi_openai(keluhan: str) -> str:
 
         # Prompt yang sudah diperkuat untuk memaksa struktur lengkap termasuk obat
         prompt = f"""
-Kamu adalah seorang ahli pertanian dan agronomi khusus tanaman cabai. Tugasmu adalah menganalisis keluhan petani, meskipun dalam bahasa sehari-hari, dan memberikan diagnosa penyakit serta solusi lengkap.
+Kamu adalah seorang ahli pertanian dan agronomi khusus tanaman cabai.  
+Tugasmu adalah menganalisis keluhan petani, yang mungkin disampaikan dengan bahasa sehari-hari, dan memberikan diagnosa penyakit serta solusi lengkap.
 
-Jika keluhan tidak terkait cabai, cukup katakan bahwa kamu tidak bisa membantu. Tapi jika keluhan menunjukkan gejala seperti daun keriting, menguning, busuk, dll, anggap sebagai penyakit cabai dan tanggapi secara profesional.
+Berikan jawaban yang SANGAT TERSTRUKTUR dan JELAS dengan bahasa yang sederhana agar mudah dipahami petani.
 
-Jawaban kamu HARUS mencakup seluruh bagian berikut secara jelas dan terpisah. Jangan hilangkan bagian apapun. Gunakan bahasa sederhana agar mudah dipahami oleh petani.
+**BATASAN:**  
+- Fokus hanya pada tanaman cabai dan gejala-gejala yang umum terjadi pada tanaman cabai.  
+- Jika keluhan tidak terkait cabai, jawab dengan kalimat sopan bahwa kamu tidak dapat membantu.
 
-Format jawaban (WAJIB SESUAI FORMAT):
+**Format jawaban WAJIB ikuti persis seperti ini:**  
+Nama Penyakit: [nama penyakit singkat]  
+Penyebab: [penyebab utama singkat, jelas]  
+Pengobatan:  
+1. [langkah pengobatan 1]  
+2. [langkah pengobatan 2]  
+...  
+Pencegahan:  
+1. [langkah pencegahan 1]  
+2. [langkah pencegahan 2]  
+...  
+Obat herbal: [jika ada sebutkan, jika tidak tulis "Tidak tersedia"]  
+Obat kimia: [sebutkan bahan aktif pestisida/fungisida, jangan merek dagang]
 
-Nama Penyakit: [Isi, misalnya Antraknosa]
-Penyebab: [Singkat, jelas, misalnya jamur Colletotrichum sp.]
-Pengobatan:
-1. [Langkah 1]
-2. [Langkah 2]
-Pencegahan:
-1. [Langkah pencegahan 1]
-2. [Langkah pencegahan 2]
-Obat herbal: [Sebutkan jika ada, jika tidak ada tulis "Tidak tersedia"]
-Obat kimia: [Sebutkan bahan aktif pestisida atau fungisida, bukan nama merek dagang]
+**Catatan penting:**  
+- Jika tidak ada data untuk salah satu bagian, tuliskan "Tidak tersedia" pada bagian tersebut, jangan dikosongkan.  
+- Gunakan poin-poin untuk pengobatan dan pencegahan agar mudah dibaca.  
+- Jangan menambahkan informasi di luar format yang diminta.  
+- Jawaban harus lengkap dan jangan melewatkan bagian apapun.
+
+**Contoh jawaban:**  
+Nama Penyakit: Antraknosa  
+Penyebab: Jamur Colletotrichum sp.  
+Pengobatan:  
+1. Semprot dengan fungisida berbahan aktif mancozeb.  
+2. Buang dan musnahkan bagian tanaman yang terinfeksi.  
+Pencegahan:  
+1. Hindari penyiraman pada daun agar daun tetap kering.  
+2. Rotasi tanaman dengan tanaman non-solanaceae.  
+Obat herbal: Ekstrak daun mimba.  
+Obat kimia: Mancozeb, Tebuconazole.
 
 Keluhan petani: "{keluhan}"
 """
-
         response = client.chat.completions.create(
             model=deployment_name,
             messages=[
