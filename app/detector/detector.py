@@ -26,7 +26,16 @@ async def predict_disease(image_bytes: bytes) -> dict:
         )
 
         # Output sudah berupa dictionary hasil prediksi (confidence setiap label)
-        return result
+        # Ambil label dengan confidence tertinggi
+        top_label = max(result.items(), key=lambda x: x[1])[0]
+        confidences = [{"label": k, "confidence": v} for k, v in result.items()]
+
+        return {
+            "data": {
+                "label": top_label,
+                "confidences": confidences
+            }
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
