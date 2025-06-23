@@ -1,9 +1,8 @@
 import os
-import io
-import asyncio
+import tempfile
 import logging
-from gradio_client import Client
 from fastapi import HTTPException
+from gradio_client import Client, handle_file
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,68 +17,44 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s',
 )
 
-def parse_result_text(text: str) -> dict:
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    if not lines:
-        return {"label": None, "confidences": []}
-
-    label = lines[0]
-    confidences = []
-    for i in range(1, len(lines), 2):
-        try:
-            lbl = lines[i]
-            confidence_str = lines[i + 1].replace('%', '')
-            confidence = float(confidence_str) / 100.0
-            confidences.append({"label": lbl.capitalize(), "confidence": round(confidence, 4)})
-        except (IndexError, ValueError):
-            continue
-
-    return {"label": label.capitalize(), "confidences": confidences}
 
 async def predict_disease(image_bytes: bytes, max_retries: int = 3) -> dict:
     """
     Kirim gambar ke Hugging Face Space dan dapatkan prediksi.
-    Retry otomatis jika gagal sampai max_retries.
+    Gunakan file sementara karena gradio_client memerlukan handle_file().
     """
     attempt = 0
     last_exception = None
+    temp_file_path = None
 
-    # Gunakan BytesIO agar tidak perlu simpan file di disk
-    image_file = io.BytesIO(image_bytes)
-    image_file.name = "image.jpg"  # handle_file butuh attribute name
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+            temp_file.write(image_bytes)
+            temp_file_path = temp_file.name
 
-    while attempt < max_retries:
-        try:
-            logging.info(f"Predict attempt {attempt + 1}")
+        while attempt < max_retries:
+            try:
+                logging.info(f"[Attempt {attempt + 1}] Sending to HF: {temp_file_path}")
+                result = client.predict(
+                    image=handle_file(temp_file_path),
+                    api_name="/predict"
+                )
 
-            result = client.predict(
-                image=image_file,
-                api_name="/predict"
-            )
+                # Validasi format
+                if isinstance(result, dict) and "label" in result and "confidences" in result:
+                    logging.info(f"Prediction result: {result}")
+                    return {"data": result}
 
-            # Reset pointer BytesIO agar bisa dibaca ulang jika retry
-            image_file.seek(0)
+                raise ValueError("Response format tidak sesuai")
 
-            # Jika response berupa string, parse dulu
-            if isinstance(result, str):
-                parsed = parse_result_text(result)
-                if parsed["label"] is None:
-                    raise ValueError("Parsed label kosong")
-                return {"data": parsed}
+            except Exception as e:
+                logging.warning(f"Prediction attempt {attempt + 1} failed: {e}")
+                last_exception = e
+                attempt += 1
 
-            # Jika response dict valid, return langsung
-            if isinstance(result, dict) and "label" in result and "confidences" in result:
-                return {"data": result}
+        logging.error("All prediction attempts failed.")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {last_exception}")
 
-            raise ValueError("Response format tidak valid")
-
-        except Exception as e:
-            logging.warning(f"Prediction attempt {attempt + 1} failed: {e}")
-            last_exception = e
-            attempt += 1
-            await asyncio.sleep(1)  # jeda sebelum retry
-
-    # Jika gagal semua retry
-    logging.error("Prediction failed after retries")
-    raise HTTPException(status_code=500, detail=f"Prediction failed: {last_exception}")
-
+    finally:
+        if temp_file_path and os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
