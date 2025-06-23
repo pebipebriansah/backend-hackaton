@@ -1,9 +1,10 @@
 import os
-import tempfile
-from gradio_client import Client, handle_file
+import io
+import asyncio
+import logging
+from gradio_client import Client
 from fastapi import HTTPException
 from dotenv import load_dotenv
-import logging
 
 load_dotenv()
 
@@ -12,14 +13,17 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 
 client = Client(HF_SPACE_NAME, hf_token=HF_TOKEN)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+)
+
 def parse_result_text(text: str) -> dict:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    
     if not lines:
         return {"label": None, "confidences": []}
-    
-    label = lines[0]  # Label utama
 
+    label = lines[0]
     confidences = []
     for i in range(1, len(lines), 2):
         try:
@@ -28,38 +32,54 @@ def parse_result_text(text: str) -> dict:
             confidence = float(confidence_str) / 100.0
             confidences.append({"label": lbl.capitalize(), "confidence": round(confidence, 4)})
         except (IndexError, ValueError):
-            continue  # Skip error entry
-    
+            continue
+
     return {"label": label.capitalize(), "confidences": confidences}
 
-async def predict_disease(image_bytes: bytes) -> dict:
-    temp_file_path = None
-    try:
-        # Simpan file gambar sementara
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
-            temp_file.write(image_bytes)
-            temp_file_path = temp_file.name
+async def predict_disease(image_bytes: bytes, max_retries: int = 3) -> dict:
+    """
+    Kirim gambar ke Hugging Face Space dan dapatkan prediksi.
+    Retry otomatis jika gagal sampai max_retries.
+    """
+    attempt = 0
+    last_exception = None
 
-        # Kirim gambar ke endpoint Gradio / Hugging Face
-        result = client.predict(
-            image=handle_file(temp_file_path),
-            api_name="/predict"
-        )
+    # Gunakan BytesIO agar tidak perlu simpan file di disk
+    image_file = io.BytesIO(image_bytes)
+    image_file.name = "image.jpg"  # handle_file butuh attribute name
 
-        # Logging (opsional)
-        logging.info(f"Model response: {result}")
+    while attempt < max_retries:
+        try:
+            logging.info(f"Predict attempt {attempt + 1}")
 
-        # Validasi format response
-        if not isinstance(result, dict) or "label" not in result or "confidences" not in result:
-            raise HTTPException(status_code=500, detail="Format response model tidak valid.")
+            result = client.predict(
+                image=image_file,
+                api_name="/predict"
+            )
 
-        # Langsung kembalikan result sebagai 'data'
-        return {"data": result}
+            # Reset pointer BytesIO agar bisa dibaca ulang jika retry
+            image_file.seek(0)
 
-    except Exception as e:
-        logging.exception("Prediction failed")
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+            # Jika response berupa string, parse dulu
+            if isinstance(result, str):
+                parsed = parse_result_text(result)
+                if parsed["label"] is None:
+                    raise ValueError("Parsed label kosong")
+                return {"data": parsed}
 
-    finally:
-        if temp_file_path and os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
+            # Jika response dict valid, return langsung
+            if isinstance(result, dict) and "label" in result and "confidences" in result:
+                return {"data": result}
+
+            raise ValueError("Response format tidak valid")
+
+        except Exception as e:
+            logging.warning(f"Prediction attempt {attempt + 1} failed: {e}")
+            last_exception = e
+            attempt += 1
+            await asyncio.sleep(1)  # jeda sebelum retry
+
+    # Jika gagal semua retry
+    logging.error("Prediction failed after retries")
+    raise HTTPException(status_code=500, detail=f"Prediction failed: {last_exception}")
+
