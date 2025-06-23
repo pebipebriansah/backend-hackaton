@@ -11,26 +11,6 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 
 client = Client(HF_SPACE_NAME, hf_token=HF_TOKEN)
 
-def parse_result_text(text: str) -> dict:
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    
-    if not lines:
-        return {"label": None, "confidences": []}
-    
-    label = lines[0]  # Label utama
-
-    confidences = []
-    for i in range(1, len(lines), 2):
-        try:
-            lbl = lines[i]
-            confidence_str = lines[i + 1].replace('%', '')
-            confidence = float(confidence_str) / 100.0
-            confidences.append({"label": lbl.capitalize(), "confidence": round(confidence, 4)})
-        except (IndexError, ValueError):
-            continue  # Skip error entry
-    
-    return {"label": label.capitalize(), "confidences": confidences}
-
 async def predict_disease(image_bytes: bytes) -> dict:
     temp_file_path = None
     try:
@@ -39,20 +19,18 @@ async def predict_disease(image_bytes: bytes) -> dict:
             temp_file.write(image_bytes)
             temp_file_path = temp_file.name
 
-        # Kirim ke Gradio
-        result_raw = client.predict(
+        # Kirim ke Gradio endpoint (asumsi `predict` adalah route utama)
+        result = client.predict(
             image=handle_file(temp_file_path),
-            api_name="/predict"
+            api_name="/predict"  # pastikan sesuai dengan `gr.Interface(fn=..., api_name="/predict")` jika ingin eksplisit
         )
 
-        # Jika hasil adalah string, parse ke dictionary
-        if isinstance(result_raw, str):
-            return parse_result_text(result_raw)
-
-        return result_raw
+        # Output sudah berupa dictionary hasil prediksi (confidence setiap label)
+        return result
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
     finally:
         if temp_file_path and os.path.exists(temp_file_path):
             os.remove(temp_file_path)
