@@ -73,7 +73,7 @@ Keluhan petani: "{keluhan}"
 """
 
         response = client.chat.completions.create(
-            model="deepseek-chat",  # Ganti sesuai model OpenRouter yang kamu pakai
+            model="openai/gpt-3.5-turbo",  # Ganti sesuai model OpenRouter yang kamu pakai
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli penyakit tanaman cabai. Jawablah dengan bahasa sederhana dan struktural sesuai format."},
                 {"role": "user", "content": prompt}
