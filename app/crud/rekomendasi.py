@@ -1,24 +1,15 @@
-from openai import AzureOpenAI
+from openai import OpenAI
 import os
 
 # Load environment variables
-api_key = os.getenv("AZURE_OPENAI_KEY")
-endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-api_version = "2024-05-01-preview"
+api_key = os.getenv("OPENROUTER_API_KEY")  # API key dari OpenRouter.ai
+base_url = "https://openrouter.ai/api/v1"  # Endpoint OpenRouter
 
-# Inisialisasi klien Azure OpenAI
-client = AzureOpenAI(
-    api_key=api_key,
-    azure_endpoint=endpoint,
-    api_version=api_version
-)
+# Inisialisasi klien OpenAI dengan OpenRouter base_url
+client = OpenAI(api_key=api_key, base_url=base_url)
 
 def generate_rekomendasi_openai(keluhan: str) -> str:
     try:
-        if not deployment_name:
-            raise ValueError("AZURE_OPENAI_DEPLOYMENT tidak ditemukan.")
-
         # Kata kunci untuk memastikan input relevan
         kata_kunci_valid = [
             "cabai", "cabe", "tanaman", "bibit", "daun", "batang", "akar", "buah",
@@ -80,8 +71,9 @@ Obat kimia: Mancozeb, Tebuconazole.
 
 Keluhan petani: "{keluhan}"
 """
+
         response = client.chat.completions.create(
-            model=deployment_name,
+            model="deepseek-chat",  # Ganti sesuai model OpenRouter yang kamu pakai
             messages=[
                 {"role": "system", "content": "Kamu adalah ahli penyakit tanaman cabai. Jawablah dengan bahasa sederhana dan struktural sesuai format."},
                 {"role": "user", "content": prompt}
