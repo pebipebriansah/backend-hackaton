@@ -29,9 +29,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.include_router(petani.router, prefix="/petani", tags=["Petani"])
 app.include_router(rekomendasi.router, prefix="/rekomendasi", tags=["Rekomendasi"])
-app.include_router(cuaca.router, prefix="/cuaca", tags=["Cuaca"])
-app.include_router(harga.router, prefix="/harga", tags=["Harga"])
 app.include_router(predict.router, prefix="/deteksi", tags=["Deteksi"])
